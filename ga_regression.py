@@ -111,3 +111,5 @@ print("Predictions of the trained network : {predictions}".format(predictions=pr
 # Calculating some statistics
 abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
 print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+
+print(abc)
