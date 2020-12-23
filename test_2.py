@@ -52,6 +52,7 @@ import numpy as np
 import pandas as pd
 import os
 import re
+from sklearn.model_selection import train_test_split
 data_inputs = np.array([[1, 1],[1, 0],[0, 1],[0, 0]])
 
 
@@ -78,7 +79,12 @@ data_inputs = np.array([[1, 1],[1, 0],[0, 1],[0, 0]])
 from Data_set import Data_set
 a='NH3'
 q = Data_set(a)
-print(q.name)
+print(q.label)
 x,y = q.get_data_ga()
 print('y: ', y)
-print('x: ', len(x))
+print('x: ', x)
+X_train, X_test, Y_train, Y_test = train_test_split(x, y, test_size = 0.2, random_state = 42)
+print('X_train: ', X_train)
+print('Y_train: ',len (Y_train))
+print('X_test: ', X_test)
+print('Y_test: ', Y_test)
