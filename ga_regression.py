@@ -32,13 +32,16 @@ last_fitness = 0
 # Preparing the NumPy array of the inputs.
 data_inputs = numpy.array([[2, 5, -3, 0.1],
                            [8, 15, 20, 13]])
+print('data_inputs: ', data_inputs)
 
 # Preparing the NumPy array of the outputs.
 data_outputs = numpy.array([[0.1, 0.2],
                             [1.8, 1.5]])
+print('data_outputs: ', data_outputs)
 
 # The length of the input vector for each sample (i.e. number of neurons in the input layer).
 num_inputs = data_inputs.shape[1]
+print('num_inputs: ', num_inputs)
 
 # Creating an initial population of neural networks. The return of the initial_population() function holds references to the networks, not their weights. Using such references, the weights of all networks can be fetched.
 num_solutions = 6 # A solution or a network can be used interchangeably.
