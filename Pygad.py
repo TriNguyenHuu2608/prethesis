@@ -9,8 +9,8 @@ def fitness_func(solution, sol_idx):
     global GANN_instance, data_inputs, data_outputs
 
     predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
-                                    data_inputs=data_inputs
-                                    ,problem_type="regression")
+                                    data_inputs=data_inputs)
+                                    # ,problem_type="regression")
     # print('predictions: ', predictions)
     correct_predictions = np.where(predictions == data_outputs)[0].size
     solution_fitness = (correct_predictions/data_outputs.size)*100
@@ -35,14 +35,14 @@ if __name__ == '__main__':
     q = Data_set(name)
     data_inputs,data_outputs = q.get_data_ga()
 
-    GANN_instance = pygad.gann.GANN(num_solutions=5,num_neurons_input=452,num_neurons_output=2,num_neurons_hidden_layers=[2],hidden_activations=["relu"],output_activation='softmax')
+    GANN_instance = pygad.gann.GANN(num_solutions=5,num_neurons_input=352,num_neurons_output=2,num_neurons_hidden_layers=[2],hidden_activations=["relu"],output_activation='softmax')
     
     population_vectors = pygad.gann.population_as_vectors(population_networks=GANN_instance.population_networks)
     
     ga_instance = pygad.GA(num_generations=100, 
                         num_parents_mating=3, 
                         initial_population=population_vectors.copy(),
-                        fitness_func=fitness_func(),
+                        fitness_func=fitness_func,
                         mutation_percent_genes=5,
                         callback_generation=callback_generation)
 

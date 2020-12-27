@@ -1,14 +1,18 @@
-import numpy
+import numpy as np
 import pygad
 import pygad.nn
 import pygad.gann
+from Data_set import Data_set
+from sklearn.model_selection import train_test_split
 
 def fitness_func(solution, sol_idx):
     global GANN_instance, data_inputs, data_outputs
 
     predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
                                    data_inputs=data_inputs, problem_type="regression")
-    solution_fitness = 1.0/numpy.mean(numpy.abs(predictions - data_outputs))
+    # print('predictions: ', predictions)
+    solution_fitness = 1.0/np.mean(np.abs(predictions - data_outputs))
+    # print('solution_fitness: ', solution_fitness)
 
     return solution_fitness
 
@@ -26,93 +30,104 @@ def callback_generation(ga_instance):
 
     last_fitness = ga_instance.best_solution()[1].copy()
 
-# Holds the fitness value of the previous generation.
-last_fitness = 0
 
-# Preparing the NumPy array of the inputs.
-data_inputs = numpy.array([[2, 5, -3, 0.1],
-                           [8, 15, 20, 13]])
-print('data_inputs: ', data_inputs)
+if __name__ == "__main__":
+    
+    # modified input data 
+    name='NO3'
+    q=Data_set(name)
+    data_inputs,data_outputs = q.get_data_ga()
+    X_train, X_test, Y_train, Y_test = train_test_split(data_inputs,data_outputs, test_size=0.2, random_state=42)
+    data_inputs = X_train
+    data_outputs = Y_train
+    
+    # Holds the fitness value of the previous generation.
+    last_fitness = 0
 
-# Preparing the NumPy array of the outputs.
-data_outputs = numpy.array([[0.1, 0.2],
-                            [1.8, 1.5]])
-print('data_outputs: ', data_outputs)
+    # Preparing the NumPy array of the inputs.
+    # data_inputs = np.array([[2, 5, -3, 0.1],
+    #                         [8, 15, 20, 13]])
+    print('data_inputs: ', data_inputs)
 
-# The length of the input vector for each sample (i.e. number of neurons in the input layer).
-num_inputs = data_inputs.shape[1]
-print('num_inputs: ', num_inputs)
+    # Preparing the NumPy array of the outputs.
+    # data_outputs = np.array([[0.1, 0.2],
+    #                             [1.8, 1.5]])
+    print('data_outputs: ', data_outputs)
 
-# Creating an initial population of neural networks. The return of the initial_population() function holds references to the networks, not their weights. Using such references, the weights of all networks can be fetched.
-num_solutions = 6 # A solution or a network can be used interchangeably.
-GANN_instance = pygad.gann.GANN(num_solutions=num_solutions,
-                                num_neurons_input=num_inputs,
-                                num_neurons_hidden_layers=[2],
-                                num_neurons_output=2,
-                                hidden_activations=["relu"],
-                                output_activation="None")
+    # The length of the input vector for each sample (i.e. number of neurons in the input layer).
+    num_inputs = data_inputs.shape[1]
+    print('num_inputs: ', num_inputs)
 
-# population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
-# If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
-population_vectors = pygad.gann.population_as_vectors(population_networks=GANN_instance.population_networks)
+    # Creating an initial population of neural networks. The return of the initial_population() function holds references to the networks, not their weights. Using such references, the weights of all networks can be fetched.
+    num_solutions = 6 # A solution or a network can be used interchangeably.
+    GANN_instance = pygad.gann.GANN(num_solutions=num_solutions,
+                                    num_neurons_input=num_inputs,
+                                    num_neurons_hidden_layers=[2],
+                                    num_neurons_output=1,
+                                    hidden_activations=["relu"],
+                                    output_activation="None")
 
-# To prepare the initial population, there are 2 ways:
-# 1) Prepare it yourself and pass it to the initial_population parameter. This way is useful when the user wants to start the genetic algorithm with a custom initial population.
-# 2) Assign valid integer values to the sol_per_pop and num_genes parameters. If the initial_population parameter exists, then the sol_per_pop and num_genes parameters are useless.
-initial_population = population_vectors.copy()
+    # population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
+    # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
+    population_vectors = pygad.gann.population_as_vectors(population_networks=GANN_instance.population_networks)
 
-num_parents_mating = 4 # Number of solutions to be selected as parents in the mating pool.
+    # To prepare the initial population, there are 2 ways:
+    # 1) Prepare it yourself and pass it to the initial_population parameter. This way is useful when the user wants to start the genetic algorithm with a custom initial population.
+    # 2) Assign valid integer values to the sol_per_pop and num_genes parameters. If the initial_population parameter exists, then the sol_per_pop and num_genes parameters are useless.
+    initial_population = population_vectors.copy()
+    # print('initial_population: ', initial_population)
 
-num_generations = 500 # Number of generations.
+    num_parents_mating = 4 # Number of solutions to be selected as parents in the mating pool.
 
-mutation_percent_genes = 5 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
+    num_generations = 200 # Number of generations.
 
-parent_selection_type = "sss" # Type of parent selection.
+    mutation_percent_genes = 5 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
 
-crossover_type = "single_point" # Type of the crossover operator.
+    parent_selection_type = "sss" # Type of parent selection.
 
-mutation_type = "random" # Type of the mutation operator.
+    crossover_type = "single_point" # Type of the crossover operator.
 
-keep_parents = 1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
+    mutation_type = "random" # Type of the mutation operator.
 
-init_range_low = -1
-init_range_high = 1
+    keep_parents = 1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
-ga_instance = pygad.GA(num_generations=num_generations, 
-                       num_parents_mating=num_parents_mating, 
-                       initial_population=initial_population,
-                       fitness_func=fitness_func,
-                       mutation_percent_genes=mutation_percent_genes,
-                       init_range_low=init_range_low,
-                       init_range_high=init_range_high,
-                       parent_selection_type=parent_selection_type,
-                       crossover_type=crossover_type,
-                       mutation_type=mutation_type,
-                       keep_parents=keep_parents,
-                       on_generation=callback_generation)
+    init_range_low = -1
+    init_range_high = 1
 
-ga_instance.run()
+    ga_instance = pygad.GA(num_generations=num_generations, 
+                        num_parents_mating=num_parents_mating, 
+                        initial_population=initial_population,
+                        fitness_func=fitness_func,
+                        mutation_percent_genes=mutation_percent_genes,
+                        init_range_low=init_range_low,
+                        init_range_high=init_range_high,
+                        parent_selection_type=parent_selection_type,
+                        crossover_type=crossover_type,
+                        mutation_type=mutation_type,
+                        keep_parents=keep_parents,
+                        on_generation=callback_generation)
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-ga_instance.plot_result()
+    ga_instance.run()
 
-# Returning the details of the best solution.
-solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print("Parameters of the best solution : {solution}".format(solution=solution))
-print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+    ga_instance.plot_result()
 
-if ga_instance.best_solution_generation != -1:
-    print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
+    # Returning the details of the best solution.
+    solution, solution_fitness, solution_idx = ga_instance.best_solution()
+    print("Parameters of the best solution : {solution}".format(solution=solution))
+    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-# Predicting the outputs of the data using the best solution.
-predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[solution_idx],
-                               data_inputs=data_inputs,
-                               problem_type="regression")
-print("Predictions of the trained network : {predictions}".format(predictions=predictions))
+    if ga_instance.best_solution_generation != -1:
+        print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
 
-# Calculating some statistics
-abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
-print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+    # Predicting the outputs of the data using the best solution.
+    predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[solution_idx],
+                                data_inputs=X_test,
+                                problem_type="regression")
+    print('Actual test data value :', Y_test)
+    print("Predictions of the trained network : {predictions}".format(predictions=predictions))
 
-print(abc)
+    # Calculating some statistics
+    abs_error = np.mean(np.abs(predictions - Y_test))
+    print("Absolute error : {abs_error}.".format(abs_error=abs_error)) 
