@@ -44,9 +44,6 @@ if __name__ == "__main__":
     # Holds the fitness value of the previous generation.
     last_fitness = 0
 
-    # Preparing the NumPy array of the inputs.
-    # data_inputs = np.array([[2, 5, -3, 0.1],
-    #                         [8, 15, 20, 13]])
     print('data_inputs: ', data_inputs)
 
     # Preparing the NumPy array of the outputs.
